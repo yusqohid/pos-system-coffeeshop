@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Products\Tables;
 
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
@@ -16,14 +17,17 @@ class ProductsTable
     {
         return $table
             ->columns([
-                TextColumn::make('category_id')
+                TextColumn::make('category.name')
+                    ->label('Kategori')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('name')
-                    ->searchable(),
+                    ->label('Name')
+                    ->searchable()
+                    ->sortable(),
                 ImageColumn::make('image'),
                 TextColumn::make('price')
-                    ->money()
+                    ->money('IDR')
                     ->sortable(),
                 TextColumn::make('stock')
                     ->numeric()
@@ -44,6 +48,7 @@ class ProductsTable
             ])
             ->recordActions([
                 EditAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
