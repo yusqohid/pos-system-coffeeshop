@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\OrderStatus;
 use Database\Factories\OrderFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,6 +16,8 @@ class Order extends Model
 
     protected $fillable = [
         'customer_id',
+        'order_number',
+        'status',
         'total_price',
         'date',
     ];
@@ -32,6 +35,7 @@ class Order extends Model
     protected function casts(): array
     {
         return [
+            'status' => OrderStatus::class,
             'total_price' => 'decimal:2',
             'date' => 'datetime',
         ];

@@ -18,6 +18,8 @@ class OrderFactory extends Factory
     {
         return [
             'customer_id' => Customer::factory(),
+            'order_number' => 'ORD-'.fake()->unique()->numerify('########'),
+            'status' => 'pending',
             'total_price' => fake()->randomFloat(2, 10_000, 500_000),
             'date' => fake()->dateTimeBetween('-1 month', 'now'),
         ];
