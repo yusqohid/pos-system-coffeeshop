@@ -2,6 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\LatestOrders;
+use App\Filament\Widgets\LowStockProducts;
+use App\Filament\Widgets\TodaySalesStats;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -38,6 +41,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
+                TodaySalesStats::class,
+                LatestOrders::class,
+                LowStockProducts::class,
                 AccountWidget::class,
                 FilamentInfoWidget::class,
             ])
