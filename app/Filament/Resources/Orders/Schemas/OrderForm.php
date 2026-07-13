@@ -2,8 +2,11 @@
 
 namespace App\Filament\Resources\Orders\Schemas;
 
+use App\Enums\OrderStatus;
 use App\Models\Customer;
+use App\Models\OrderDetail;
 use App\Models\Product;
+use App\Services\OrderService;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Repeater\TableColumn;
@@ -21,6 +24,15 @@ class OrderForm
     {
         return $schema
             ->components([
+                TextInput::make('order_number')
+                    ->label('Nomor Order')
+                    ->disabled()
+                    ->dehydrated(false)
+                    ->visibleOn('edit'),
+                Select::make('status')
+                    ->options(OrderStatus::class)
+                    ->default(OrderStatus::Pending)
+                    ->required(),
                 DateTimePicker::make('date')
                     ->default(now())
                     ->readOnly()
@@ -51,7 +63,9 @@ class OrderForm
                             ->afterStateUpdated(fn (Set $set, Get $get) => self::updateTotalPrice($set, $get))
                             ->table([
                                 TableColumn::make('Nama Produk')
-                                    ->width('400px'),
+                                    ->width('300px'),
+                                TableColumn::make('Stok')
+                                    ->width('80px'),
                                 TableColumn::make('Jumlah')
                                     ->width('120px'),
                                 TableColumn::make('Subtotal'),
@@ -74,10 +88,14 @@ class OrderForm
                                             productId: filled($state) ? (int) $state : null,
                                         ),
                                     ),
+                                TextEntry::make('available_stock')
+                                    ->label('Stok')
+                                    ->state(fn (Get $get): ?string => self::formatAvailableStock($get)),
                                 TextInput::make('qty')
                                     ->numeric()
                                     ->default(1)
                                     ->minValue(1)
+                                    ->maxValue(fn (Get $get): ?int => self::resolveMaxQty($get))
                                     ->required()
                                     ->live()
                                     ->afterStateUpdated(
@@ -141,5 +159,27 @@ class OrderForm
 
             return $qty * $price;
         });
+    }
+
+    private static function resolveMaxQty(Get $get): ?int
+    {
+        $productId = $get('product_id');
+
+        if (! filled($productId)) {
+            return null;
+        }
+
+        $existingDetail = filled($get('id'))
+            ? OrderDetail::query()->find($get('id'))
+            : null;
+
+        return app(OrderService::class)->getAvailableStock((int) $productId, $existingDetail);
+    }
+
+    private static function formatAvailableStock(Get $get): ?string
+    {
+        $available = self::resolveMaxQty($get);
+
+        return $available === null ? null : (string) $available;
     }
 }

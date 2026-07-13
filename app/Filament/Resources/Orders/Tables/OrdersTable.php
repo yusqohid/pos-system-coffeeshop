@@ -14,9 +14,16 @@ class OrdersTable
     {
         return $table
             ->columns([
+                TextColumn::make('order_number')
+                    ->label('No. Order')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('customer.name')
                     ->label('Nama Customer')
                     ->searchable()
+                    ->sortable(),
+                TextColumn::make('status')
+                    ->badge()
                     ->sortable(),
                 TextColumn::make('total_price')
                     ->label('Harga Total')
@@ -35,6 +42,7 @@ class OrdersTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('date', 'desc')
             ->filters([
                 //
             ])
