@@ -22,7 +22,9 @@ class ProductForm
                     ->required(),
                 FileUpload::make('image')
                     ->image()
-                    ->directory('products'),
+                    ->disk('public')
+                    ->directory('products')
+                    ->visibility('public'),
                 TextInput::make('price')
                     ->required()
                     ->numeric()

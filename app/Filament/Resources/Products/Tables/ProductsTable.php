@@ -9,7 +9,11 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProductsTable
 {
@@ -44,7 +48,16 @@ class ProductsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('category')
+                    ->label('Kategori')
+                    ->relationship('category', 'name')
+                    ->searchable()
+                    ->preload(),
+                TernaryFilter::make('is_active')
+                    ->label('Status Aktif'),
+                Filter::make('low_stock')
+                    ->label('Stok Rendah (< 10)')
+                    ->query(fn (Builder $query): Builder => $query->where('stock', '<', 10)),
             ])
             ->recordActions([
                 EditAction::make(),
